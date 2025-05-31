@@ -36,7 +36,6 @@
               <strong>Album:</strong> {{ result.correct.album }}
             </div>
           </div>
-          <p v-if="round === maxRounds && !finished && result">Calculating final score...</p>
         </div>
 
         <button
@@ -49,7 +48,7 @@
       </template>
 
       <template v-else-if="finished">
-        <FinalScore :score="finalScore" :rounds="maxRounds" @restart="restartGame" />
+        <FinalScore :rounds="maxRounds" :gameSessionId="gameSessionId" @restart="restartGame" />
       </template>
 
       <template v-else>
@@ -109,11 +108,10 @@ export default defineComponent({
       round: 1,
       maxRounds: 5,
       finished: false,
-      finalScore: 0,
       usedSongIds: [] as number[],
       timer: 45,
       timerInterval: null as number | null,
-      snippetDuration: 30, // Default snippet duration in seconds
+      snippetDuration: 30,
     }
   },
   computed: {
@@ -158,7 +156,9 @@ export default defineComponent({
 
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/deezer/song?genre_id=${genreId}&genre=${encodeURIComponent(genreName as string)}`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/deezer/song?genre_id=${genreId}&genre=${encodeURIComponent(
+            genreName as string,
+          )}`,
         )
 
         const song = await res.json()
@@ -197,7 +197,10 @@ export default defineComponent({
       }
       this.result = null
 
-      if (this.round > this.maxRounds) return
+      if (this.round > this.maxRounds) {
+        this.finished = true
+        return
+      }
 
       if (this.timerInterval) clearInterval(this.timerInterval)
       await this.fetchRandomDeezerSong()
@@ -219,18 +222,6 @@ export default defineComponent({
 
         if (this.round === this.maxRounds) {
           this.finished = true
-
-          setTimeout(async () => {
-            const scoreRes = await axios.get(
-              `${import.meta.env.VITE_BACKEND_URL}/api/game/score/${this.gameSessionId}`,
-            )
-            this.finalScore = scoreRes.data.score
-
-            this.$emit('gameFinished', {
-              score: this.finalScore,
-              rounds: this.maxRounds,
-            })
-          }, 5000)
         }
       } catch (err) {
         console.error('Error submitting guess:', err)
@@ -239,28 +230,14 @@ export default defineComponent({
     },
     checkTime() {
       const audio = this.$refs.audioPlayer as HTMLAudioElement | undefined
-      if (audio && audio.currentTime >= (this.snippetDuration || 0)) {
+      if (audio && audio.currentTime >= this.snippetDuration) {
         audio.pause()
         audio.currentTime = 0
       }
     },
-    async showFinalScore() {
-      this.finished = true
-
-      const scoreRes = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/api/game/score/${this.gameSessionId}`,
-      )
-      this.finalScore = scoreRes.data.score
-
-      this.$emit('gameFinished', {
-        score: this.finalScore,
-        rounds: this.maxRounds,
-      })
-    },
     restartGame() {
       this.finished = false
       this.round = 1
-      this.finalScore = 0
       this.result = null
       this.guess = {
         guessed_title: '',
