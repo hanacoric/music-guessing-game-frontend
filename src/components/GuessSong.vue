@@ -303,7 +303,7 @@ body {
   font-size: 28px;
   font-weight: bold;
   text-align: center;
-  color: #8a2be2;
+  color: #c600a1;
   margin-bottom: 16px;
 }
 
@@ -312,7 +312,7 @@ body {
   margin-bottom: 12px;
   font-size: 18px;
   font-weight: bold;
-  color: #4a148c;
+  color: #7a007a;
 }
 
 .button-row {
@@ -386,8 +386,9 @@ audio {
 }
 
 .form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 12px;
   margin-bottom: 20px;
 }
@@ -407,11 +408,6 @@ audio {
   border-color: #cc00aa;
   box-shadow: 0 0 8px #ffb3f6;
   outline: none;
-}
-
-.form-grid button {
-  grid-column: span 2;
-  margin-top: 10px;
 }
 
 .submit-btn,
