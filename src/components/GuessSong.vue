@@ -336,7 +336,7 @@ body {
 }
 
 .guess-game {
-  max-width: 1000px;
+  max-width: 1200px;
   width: 100%;
   padding: 32px;
   background-color: #fff0fb;
@@ -456,7 +456,7 @@ audio {
 
 .correct-answers-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px 20px;
   margin-top: 16px;
   max-width: 800px;
