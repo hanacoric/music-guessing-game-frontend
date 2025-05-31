@@ -1,6 +1,12 @@
 <template>
   <div class="guess-game-wrapper">
     <div class="guess-game">
+      <h1 class="genre-title">{{ genre }}</h1>
+
+      <div class="score-display">
+        <span>Current Score: {{ currentScore }} / {{ maxRounds * 3 }}</span>
+      </div>
+
       <template v-if="!finished && song">
         <h2 class="text-xl font-bold mb-2">Listen and Guess!</h2>
 
@@ -18,12 +24,19 @@
         <form @submit.prevent="submitGuess" class="form-grid">
           <input v-model="guess.guessed_title" type="text" placeholder="Song title" class="input" />
           <input v-model="guess.guessed_artist" type="text" placeholder="Artist" class="input" />
+          <input
+            v-model="guess.guessed_album"
+            type="text"
+            placeholder="Album"
+            class="input full-width"
+          />
 
-          <div class="full-width">
-            <input v-model="guess.guessed_album" type="text" placeholder="Album" class="input" />
+          <div class="button-row">
+            <button type="submit" class="submit-btn" :disabled="!!result">Submit Guess</button>
+            <button type="button" class="choose-genre-btn" @click="$emit('goToStart')">
+              Choose Another Genre
+            </button>
           </div>
-
-          <button type="submit" class="submit-btn" :disabled="!!result">Submit Guess</button>
         </form>
 
         <div v-if="result" class="mt-4">
@@ -36,6 +49,13 @@
               <strong>Album:</strong> {{ result.correct.album }}
             </div>
           </div>
+          <button
+            v-if="result && round === maxRounds && !finished"
+            @click="showFinalScore"
+            class="mt-4 bg-purple-600 text-white px-4 py-2 rounded"
+          >
+            See Final Score
+          </button>
         </div>
 
         <button
@@ -49,11 +69,10 @@
 
       <template v-else-if="finished">
         <FinalScore
-          v-if="showFinal && gameSessionId !== undefined"
           :score="finalScore"
           :rounds="maxRounds"
-          :gameSessionId="gameSessionId!"
-          @restart="resetToStart"
+          :gameSessionId="gameSessionId ?? ''"
+          @restart="$emit('goToStart')"
         />
       </template>
 
@@ -98,28 +117,14 @@ export default defineComponent({
     FinalScore,
   },
   props: {
-    genre: {
-      type: String,
-      required: true,
-    },
-    deezerGenreId: {
-      type: [String, Number],
-      required: true,
-    },
-    gameSessionId: {
-      type: [String, Number],
-      required: true,
-    },
-    snippetDuration: {
-      type: Number,
-      required: true,
-    },
+    genre: String,
+    deezerGenreId: [String, Number],
+    gameSessionId: [String, Number],
+    snippetDuration: Number,
   },
-
   data() {
     return {
       song: null as Song | null,
-      finalScore: 0,
       guess: {
         guessed_title: '',
         guessed_artist: '',
@@ -129,10 +134,10 @@ export default defineComponent({
       round: 1,
       maxRounds: 5,
       finished: false,
-      usedSongIds: [] as number[],
+      finalScore: 0,
+      currentScore: 0,
       timer: 45,
       timerInterval: null as number | null,
-      showFinal: true,
     }
   },
   computed: {
@@ -141,33 +146,10 @@ export default defineComponent({
     },
   },
   mounted() {
-    console.log('received in GuessSong:', {
-      genre: this.genre,
-      deezerGenreId: this.deezerGenreId,
-      gameSessionId: this.gameSessionId,
-    })
     this.fetchRandomDeezerSong()
   },
   methods: {
-    handleGoToStart() {
-      this.$emit('goToStart')
-    },
-    resetToStart() {
-      // Reset the game to the initial state
-      this.finished = false
-      this.round = 1
-      this.result = null
-      this.finalScore = 0
-      this.guess = {
-        guessed_title: '',
-        guessed_artist: '',
-        guessed_album: '',
-      }
-      this.fetchRandomDeezerSong()
-    },
-    handlePlay() {
-      console.log('Audio playing')
-    },
+    handlePlay() {},
     resetTimer() {
       if (this.timerInterval) clearInterval(this.timerInterval)
       this.timer = 45
@@ -181,25 +163,19 @@ export default defineComponent({
       }, 1000)
     },
     handleTimeout() {
-      if (!this.result) {
-        this.submitGuess()
-      }
+      if (!this.result) this.submitGuess()
     },
     async fetchRandomDeezerSong() {
+      this.resetTimer()
       const genreId = this.deezerGenreId
       const genreName = this.genre
 
-      this.resetTimer()
-
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/deezer/song?genre_id=${genreId}&genre=${encodeURIComponent(
-            genreName as string,
-          )}`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/deezer/song?genre_id=${genreId}&genre=${encodeURIComponent(genreName as string)}`,
         )
 
         const song = await res.json()
-
         if (song.error) {
           alert(song.error)
           return
@@ -221,26 +197,9 @@ export default defineComponent({
           }
         })
       } catch (err) {
-        console.error('Failed to fetch song from Laravel API:', err)
+        console.error('Failed to fetch song:', err)
         alert('Could not load song. Please try again.')
       }
-    },
-    async nextSong() {
-      this.round++
-      this.guess = {
-        guessed_title: '',
-        guessed_artist: '',
-        guessed_album: '',
-      }
-      this.result = null
-
-      if (this.round > this.maxRounds) {
-        this.finished = true
-        return
-      }
-
-      if (this.timerInterval) clearInterval(this.timerInterval)
-      await this.fetchRandomDeezerSong()
     },
     async submitGuess() {
       if (this.timerInterval) clearInterval(this.timerInterval)
@@ -256,47 +215,55 @@ export default defineComponent({
         })
 
         this.result = res.data
+        this.currentScore += res.data.points_awarded
 
         if (this.round === this.maxRounds) {
-          setTimeout(async () => {
-            const scoreRes = await axios.get(
-              `${import.meta.env.VITE_BACKEND_URL}/api/game/score/${this.gameSessionId}`,
-            )
-            this.finalScore = scoreRes.data.score
-            this.finished = true
-            this.$emit('gameFinished', {
-              score: this.finalScore,
-              rounds: this.maxRounds,
-            })
-          }, 4000)
+          setTimeout(() => this.showFinalScore(), 2000)
         }
       } catch (err) {
         console.error('Error submitting guess:', err)
         alert("Couldn't submit guess. Please try again.")
       }
     },
-    checkTime() {
-      const audio = this.$refs.audioPlayer as HTMLAudioElement | undefined
-      if (audio && audio.currentTime >= this.snippetDuration) {
-        audio.pause()
-        audio.currentTime = 0
+    async showFinalScore() {
+      this.finished = true
+      try {
+        const scoreRes = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/game/score/${this.gameSessionId}`,
+        )
+        this.finalScore = scoreRes.data.score
+        this.$emit('gameFinished', {
+          score: this.finalScore,
+          rounds: this.maxRounds,
+        })
+      } catch {
+        console.error('Failed to fetch final score')
       }
     },
-    restartGame() {
-      this.finished = false
-      this.round = 1
-      this.result = null
+    async nextSong() {
+      this.round++
       this.guess = {
         guessed_title: '',
         guessed_artist: '',
         guessed_album: '',
       }
-      this.fetchRandomDeezerSong()
+      this.result = null
+
+      if (this.round > this.maxRounds) return
+
+      if (this.timerInterval) clearInterval(this.timerInterval)
+      await this.fetchRandomDeezerSong()
+    },
+    checkTime() {
+      const audio = this.$refs.audioPlayer as HTMLAudioElement | undefined
+      if (audio && audio.currentTime >= (this.snippetDuration || 0)) {
+        audio.pause()
+        audio.currentTime = 0
+      }
     },
   },
 })
 </script>
-
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Lilita+One&display=swap');
 
@@ -330,6 +297,42 @@ body {
   justify-content: center;
   font-size: 30px;
   color: #7a007a;
+}
+
+.genre-title {
+  font-size: 28px;
+  font-weight: bold;
+  text-align: center;
+  color: #8a2be2;
+  margin-bottom: 16px;
+}
+
+.score-display {
+  text-align: center;
+  margin-bottom: 12px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #4a148c;
+}
+
+.button-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.choose-genre-btn {
+  background-color: #f06292;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.choose-genre-btn:hover {
+  background-color: #ec407a;
 }
 
 .guess-game {
