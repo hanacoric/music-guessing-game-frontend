@@ -1,83 +1,81 @@
 <template>
-  <div class="genre-score-wrapper">
+  <div class="genre-score-row">
     <h1 class="genre-title">{{ genre }}</h1>
-    <div class="score-display">
-      <span>Current Score: {{ currentScore }} / {{ maxRounds * 3 }}</span>
-    </div>
+    <span class="score-display">Current Score: {{ currentScore }} / {{ maxRounds * 3 }}</span>
+  </div>
 
-    <template v-if="!finished && song">
-      <h2 class="text-xl font-bold mb-2">Listen and Guess!</h2>
+  <template v-if="!finished && song">
+    <h2 class="text-xl font-bold mb-2">Listen and Guess!</h2>
 
-      <p class="timer">Time left: {{ timer }}s</p>
+    <p class="timer">Time left: {{ timer }}s</p>
 
-      <audio
-        ref="audioPlayer"
-        :src="audioUrl"
-        controls
-        @play="handlePlay"
-        @timeupdate="checkTime"
-        class="mb-4"
+    <audio
+      ref="audioPlayer"
+      :src="audioUrl"
+      controls
+      @play="handlePlay"
+      @timeupdate="checkTime"
+      class="mb-4"
+    />
+
+    <form @submit.prevent="submitGuess" class="form-grid">
+      <input v-model="guess.guessed_title" type="text" placeholder="Song title" class="input" />
+      <input v-model="guess.guessed_artist" type="text" placeholder="Artist" class="input" />
+      <input
+        v-model="guess.guessed_album"
+        type="text"
+        placeholder="Album"
+        class="input full-width"
       />
 
-      <form @submit.prevent="submitGuess" class="form-grid">
-        <input v-model="guess.guessed_title" type="text" placeholder="Song title" class="input" />
-        <input v-model="guess.guessed_artist" type="text" placeholder="Artist" class="input" />
-        <input
-          v-model="guess.guessed_album"
-          type="text"
-          placeholder="Album"
-          class="input full-width"
-        />
-
-        <div class="button-row">
-          <button type="submit" class="submit-btn" :disabled="!!result">Submit Guess</button>
-          <button type="button" class="choose-genre-btn" @click="$emit('goToStart')">
-            Choose Another Genre
-          </button>
-        </div>
-      </form>
-
-      <div v-if="result" class="mt-4">
-        <p>You got {{ result.points_awarded }} point(s)!</p>
-        <p><strong>Correct Answers:</strong></p>
-        <div class="correct-answers-grid">
-          <div class="answer-block"><strong>Title:</strong> {{ result.correct.title }}</div>
-          <div class="answer-block"><strong>Artist:</strong> {{ result.correct.artist }}</div>
-          <div class="answer-block full-width">
-            <strong>Album:</strong> {{ result.correct.album }}
-          </div>
-        </div>
-        <button
-          v-if="result && round === maxRounds && !finished"
-          @click="showFinalScore"
-          class="mt-4 bg-purple-600 text-white px-4 py-2 rounded"
-        >
-          See Final Score
+      <div class="button-row">
+        <button type="submit" class="submit-btn" :disabled="!!result">Submit Guess</button>
+        <button type="button" class="choose-genre-btn" @click="$emit('goToStart')">
+          Choose Another Genre
         </button>
       </div>
+    </form>
 
+    <div v-if="result" class="mt-4">
+      <p>You got {{ result.points_awarded }} point(s)!</p>
+      <p><strong>Correct Answers:</strong></p>
+      <div class="correct-answers-grid">
+        <div class="answer-block"><strong>Title:</strong> {{ result.correct.title }}</div>
+        <div class="answer-block"><strong>Artist:</strong> {{ result.correct.artist }}</div>
+        <div class="answer-block full-width">
+          <strong>Album:</strong> {{ result.correct.album }}
+        </div>
+      </div>
       <button
-        v-if="result && round < maxRounds"
-        @click="nextSong"
-        class="mt-4 bg-green-500 text-white px-4 py-2 rounded"
+        v-if="result && round === maxRounds && !finished"
+        @click="showFinalScore"
+        class="mt-4 bg-purple-600 text-white px-4 py-2 rounded"
       >
-        Next Song
+        See Final Score
       </button>
-    </template>
+    </div>
 
-    <template v-else-if="finished">
-      <FinalScore
-        :score="finalScore"
-        :rounds="maxRounds"
-        :gameSessionId="gameSessionId ?? ''"
-        @restart="$emit('goToStart')"
-      />
-    </template>
+    <button
+      v-if="result && round < maxRounds"
+      @click="nextSong"
+      class="mt-4 bg-green-500 text-white px-4 py-2 rounded"
+    >
+      Next Song
+    </button>
+  </template>
 
-    <template v-else>
-      <p class="loading">Loading a song...</p>
-    </template>
-  </div>
+  <template v-else-if="finished">
+    <FinalScore
+      :score="finalScore"
+      :rounds="maxRounds"
+      :gameSessionId="gameSessionId ?? ''"
+      @restart="$emit('goToStart')"
+    />
+  </template>
+
+  <template v-else>
+    <p class="loading">Loading a song...</p>
+  </template>
 </template>
 
 <script lang="ts">
@@ -296,20 +294,29 @@ body {
   color: #7a007a;
 }
 
+/* Updated layout for genre and score */
+.genre-score-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
 .genre-title {
   font-size: 28px;
   font-weight: bold;
-  text-align: center;
   color: #c600a1;
-  margin-bottom: 16px;
+  margin: 0;
 }
 
 .score-display {
-  text-align: center;
-  margin-bottom: 12px;
   font-size: 18px;
   font-weight: bold;
   color: #7a007a;
+  margin: 0;
 }
 
 .button-row {
@@ -521,6 +528,7 @@ audio {
   }
 }
 
+/* Mobile */
 @media (max-width: 600px) {
   .guess-game {
     padding: 24px;
@@ -534,6 +542,10 @@ audio {
   .correct-answers-grid {
     flex-direction: column;
     gap: 12px;
+  }
+
+  .genre-score-row {
+    flex-direction: column;
   }
 }
 </style>
