@@ -204,7 +204,7 @@ export default defineComponent({
       if (this.timerInterval) clearInterval(this.timerInterval)
 
       try {
-        const res = await axios.post('http://127.0.0.1:8000/api/guess', {
+        const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/guess`, {
           game_session_id: this.gameSessionId,
           song_id: this.song?.id,
           snippet_duration: this.snippetDuration,
