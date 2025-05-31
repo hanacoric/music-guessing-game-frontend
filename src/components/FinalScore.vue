@@ -8,8 +8,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue'
-import axios from 'axios'
+import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'FinalScore',
@@ -26,22 +25,6 @@ export default defineComponent({
       type: [String, Number],
       required: true,
     },
-  },
-  setup(props) {
-    const fetchedScore = ref(0)
-
-    onMounted(async () => {
-      try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/game/score/${props.gameSessionId}`,
-        )
-        fetchedScore.value = res.data.score
-      } catch (err) {
-        console.error('Failed to fetch final score', err)
-      }
-    })
-
-    return { fetchedScore }
   },
 })
 </script>
