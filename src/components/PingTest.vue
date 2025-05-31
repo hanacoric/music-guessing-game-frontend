@@ -13,7 +13,7 @@ export default {
   name: 'PingTest',
   data() {
     return {
-      message: null,
+      message: null as string | null,
     }
   },
   mounted() {
