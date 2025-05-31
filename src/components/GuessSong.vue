@@ -336,7 +336,7 @@ body {
 }
 
 .guess-game {
-  max-width: 700px;
+  max-width: 900px;
   width: 100%;
   padding: 32px;
   background-color: #fff0fb;
