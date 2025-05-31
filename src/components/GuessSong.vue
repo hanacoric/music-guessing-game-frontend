@@ -65,15 +65,6 @@
         </button>
       </template>
 
-      <template v-else-if="finished">
-        <FinalScore
-          :score="finalScore"
-          :rounds="maxRounds"
-          :gameSessionId="gameSessionId ?? ''"
-          @restart="$emit('goToStart')"
-        />
-      </template>
-
       <template v-else>
         <p class="loading">Loading a song...</p>
       </template>
@@ -84,7 +75,6 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import axios from 'axios'
-import FinalScore from './FinalScore.vue'
 
 interface Song {
   id: number
@@ -111,9 +101,6 @@ interface Result {
 
 export default defineComponent({
   name: 'GuessSong',
-  components: {
-    FinalScore,
-  },
   props: {
     genre: String,
     deezerGenreId: [String, Number],
@@ -230,10 +217,10 @@ export default defineComponent({
           `${import.meta.env.VITE_BACKEND_URL}/api/game/score/${this.gameSessionId}`,
         )
         this.finalScore = scoreRes.data.score
-        this.$emit('gameFinished', {
-          score: this.finalScore,
-          rounds: this.maxRounds,
-        })
+        if (this.round === this.maxRounds) {
+          this.finished = true
+          this.$emit('gameFinished')
+        }
       } catch {
         console.error('Failed to fetch final score')
       }

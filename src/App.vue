@@ -59,12 +59,22 @@ export default {
       this.snippetDuration = snippetDuration
       this.gameStarted = true
     },
-    handleGameFinished({ score, rounds }: { score: number; rounds: number }) {
-      this.finalScore = score
-      this.maxRounds = rounds
+    async handleGameFinished() {
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL}/api/game/score/${this.gameSessionId}`,
+        )
+        const data = await res.json()
+        this.finalScore = data.score
+      } catch (err) {
+        console.error('Failed to fetch final score', err)
+        this.finalScore = 0
+      }
+
       this.showFinal = true
       this.gameStarted = false
     },
+
     resetToStart() {
       this.genre = null
       this.deezerGenreId = null
