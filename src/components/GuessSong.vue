@@ -48,7 +48,11 @@
       </template>
 
       <template v-else-if="finished">
-        <FinalScore :rounds="maxRounds" :gameSessionId="gameSessionId" @restart="restartGame" />
+        <FinalScore
+          :rounds="maxRounds"
+          :gameSessionId="gameSessionId ?? ''"
+          @restart="restartGame"
+        />
       </template>
 
       <template v-else>
