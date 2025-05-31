@@ -49,9 +49,9 @@
 
       <template v-else-if="finished">
         <FinalScore
+          :gameSessionId="gameSessionId"
           :rounds="maxRounds"
-          :gameSessionId="gameSessionId ?? ''"
-          @restart="restartGame"
+          @goToStart="handleGoToStart"
         />
       </template>
 
@@ -132,6 +132,9 @@ export default defineComponent({
     this.fetchRandomDeezerSong()
   },
   methods: {
+    handleGoToStart() {
+      this.$emit('goToStart')
+    },
     handlePlay() {
       console.log('Audio playing')
     },
@@ -225,7 +228,17 @@ export default defineComponent({
         this.result = res.data
 
         if (this.round === this.maxRounds) {
-          this.finished = true
+          setTimeout(async () => {
+            const scoreRes = await axios.get(
+              `${import.meta.env.VITE_BACKEND_URL}/api/game/score/${this.gameSessionId}`,
+            )
+            this.finalScore = scoreRes.data.score
+            this.finished = true
+            this.$emit('gameFinished', {
+              score: this.finalScore,
+              rounds: this.maxRounds,
+            })
+          }, 4000)
         }
       } catch (err) {
         console.error('Error submitting guess:', err)

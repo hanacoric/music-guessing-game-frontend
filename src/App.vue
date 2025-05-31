@@ -2,29 +2,22 @@
   <div class="app-wrapper">
     <StartGame v-if="!gameStarted && !showFinal" @started="handleGameStart" />
     <GuessSong
-      v-if="gameStarted && !showFinal"
-      :genre="genre"
-      :deezerGenreId="deezerGenreId"
+      v-if="started"
+      :genre="selectedGenre"
+      :deezerGenreId="selectedDeezerId"
       :gameSessionId="gameSessionId"
-      :snippetDuration="snippetDuration"
       @gameFinished="handleGameFinished"
+      @goToStart="resetToStart"
     />
 
-
-
-    <FinalScore
-      v-if="showFinal"
-      :score="finalScore"
-      :rounds="maxRounds"
-      @restart="restartGame"
-    />
+    <FinalScore v-if="showFinal" :score="finalScore" :rounds="maxRounds" @restart="restartGame" />
   </div>
 </template>
 
-<script>
-import StartGame from './components/StartGame.vue';
-import GuessSong from './components/GuessSong.vue';
-import FinalScore from './components/FinalScore.vue';
+<script lang="ts">
+import StartGame from './components/StartGame.vue'
+import GuessSong from './components/GuessSong.vue'
+import FinalScore from './components/FinalScore.vue'
 
 export default {
   components: { StartGame, GuessSong, FinalScore },
@@ -38,44 +31,45 @@ export default {
       showFinal: false,
       finalScore: 0,
       maxRounds: 5,
-    };
+    }
   },
 
   methods: {
     handleGameStart({ genre, deezerGenreId, gameSessionId, snippetDuration }) {
-      this.genre = genre;
-      this.deezerGenreId = deezerGenreId;
-      this.gameSessionId = gameSessionId;
-      this.snippetDuration = snippetDuration;
-      this.gameStarted = true;
+      this.genre = genre
+      this.deezerGenreId = deezerGenreId
+      this.gameSessionId = gameSessionId
+      this.snippetDuration = snippetDuration
+      this.gameStarted = true
     },
     handleGameFinished({ score, rounds }) {
-      this.finalScore = score;
-      this.maxRounds = rounds;
-      this.showFinal = true;
-      this.gameStarted = false;
+      this.finalScore = score
+      this.maxRounds = rounds
+      this.showFinal = true
+      this.gameStarted = false
     },
     restartGame() {
-      this.genre = null;
-      this.gameSessionId = null;
-      this.finalScore = 0;
-      this.gameStarted = false;
-      this.showFinal = false;
-    }
-  }
-};
+      this.started = false
+      this.selectedGenre = ''
+      this.selectedDeezerId = null
+      this.gameSessionId = null
+      this.finalScore = 0
+      this.gameStarted = false
+      this.showFinal = false
+    },
+  },
+}
 </script>
 
-
 <style>
-
 #app {
   display: flex !important;
   flex-direction: column;
   min-height: 100vh;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
 }
@@ -91,4 +85,3 @@ html, body {
   justify-content: center;
 }
 </style>
-
