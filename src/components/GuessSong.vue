@@ -1,10 +1,11 @@
 <template>
   <div class="guess-game-wrapper">
     <div class="guess-game">
-      <h1 class="genre-title">{{ genre }}</h1>
-
-      <div class="score-display">
-        <span>Current Score: {{ currentScore }} / {{ maxRounds * 3 }}</span>
+      <div class="genre-score-row">
+        <h1 class="genre-title">{{ genre }}</h1>
+        <div class="score-display">
+          <span>Current Score: {{ currentScore }} / {{ maxRounds * 3 }}</span>
+        </div>
       </div>
 
       <template v-if="!finished && song">
@@ -299,20 +300,28 @@ body {
   color: #7a007a;
 }
 
+.genre-score-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
 .genre-title {
   font-size: 28px;
   font-weight: bold;
-  text-align: center;
   color: #c600a1;
-  margin-bottom: 16px;
+  margin: 0;
 }
 
 .score-display {
-  text-align: center;
-  margin-bottom: 12px;
   font-size: 18px;
   font-weight: bold;
   color: #7a007a;
+  margin: 0;
 }
 
 .button-row {
