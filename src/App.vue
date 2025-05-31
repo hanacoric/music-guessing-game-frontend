@@ -3,7 +3,7 @@
     <StartGame v-if="!gameStarted && !showFinal" @started="handleGameStart" />
 
     <GuessSong
-      v-if="gameStarted"
+      v-if="gameStarted && genre && deezerGenreId && gameSessionId !== null"
       :genre="genre"
       :deezerGenreId="deezerGenreId"
       :gameSessionId="gameSessionId"
@@ -12,7 +12,13 @@
       @goToStart="resetToStart"
     />
 
-    <FinalScore v-if="showFinal" :score="finalScore" :rounds="maxRounds" @restart="resetToStart" />
+    <FinalScore
+      v-if="showFinal && gameSessionId !== null"
+      :score="finalScore"
+      :rounds="maxRounds"
+      :gameSessionId="gameSessionId"
+      @restart="resetToStart"
+    />
   </div>
 </template>
 
@@ -89,6 +95,7 @@ body {
   display: flex;
   flex-direction: column;
 }
+
 /* Center FinalScore specifically */
 .app-wrapper:has(> .final-score-box) {
   align-items: center;

@@ -49,9 +49,11 @@
 
       <template v-else-if="finished">
         <FinalScore
-          :gameSessionId="gameSessionId"
+          v-if="showFinal && gameSessionId !== undefined"
+          :score="finalScore"
           :rounds="maxRounds"
-          @goToStart="handleGoToStart"
+          :gameSessionId="gameSessionId!"
+          @restart="resetToStart"
         />
       </template>
 
@@ -96,13 +98,28 @@ export default defineComponent({
     FinalScore,
   },
   props: {
-    genre: String,
-    deezerGenreId: [String, Number],
-    gameSessionId: [String, Number],
+    genre: {
+      type: String,
+      required: true,
+    },
+    deezerGenreId: {
+      type: [String, Number],
+      required: true,
+    },
+    gameSessionId: {
+      type: [String, Number],
+      required: true,
+    },
+    snippetDuration: {
+      type: Number,
+      required: true,
+    },
   },
+
   data() {
     return {
       song: null as Song | null,
+      finalScore: 0,
       guess: {
         guessed_title: '',
         guessed_artist: '',
@@ -115,7 +132,7 @@ export default defineComponent({
       usedSongIds: [] as number[],
       timer: 45,
       timerInterval: null as number | null,
-      snippetDuration: 30,
+      showFinal: true,
     }
   },
   computed: {
@@ -134,6 +151,19 @@ export default defineComponent({
   methods: {
     handleGoToStart() {
       this.$emit('goToStart')
+    },
+    resetToStart() {
+      // Reset the game to the initial state
+      this.finished = false
+      this.round = 1
+      this.result = null
+      this.finalScore = 0
+      this.guess = {
+        guessed_title: '',
+        guessed_artist: '',
+        guessed_album: '',
+      }
+      this.fetchRandomDeezerSong()
     },
     handlePlay() {
       console.log('Audio playing')

@@ -14,30 +14,34 @@ import axios from 'axios'
 export default defineComponent({
   name: 'FinalScore',
   props: {
-    gameSessionId: {
-      type: [String, Number],
+    score: {
+      type: Number,
       required: true,
     },
     rounds: {
       type: Number,
       required: true,
     },
+    gameSessionId: {
+      type: [String, Number],
+      required: true,
+    },
   },
   setup(props) {
-    const score = ref(0)
+    const fetchedScore = ref(0)
 
     onMounted(async () => {
       try {
         const res = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/api/game/score/${props.gameSessionId}`,
         )
-        score.value = res.data.score
+        fetchedScore.value = res.data.score
       } catch (err) {
         console.error('Failed to fetch final score', err)
       }
     })
 
-    return { score }
+    return { fetchedScore }
   },
 })
 </script>
