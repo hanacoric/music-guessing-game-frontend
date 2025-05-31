@@ -93,7 +93,6 @@ body {
   box-shadow: 0 0 12px #ffb3f6;
 }
 
-/* Background animation */
 @keyframes sparkleBackground {
   0% {
     background-position: 0% 50%;
