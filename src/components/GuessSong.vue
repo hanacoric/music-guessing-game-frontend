@@ -65,7 +65,7 @@
         </button>
       </template>
 
-      <template v-else>
+      <template v-else-if="!finished && !song">
         <p class="loading">Loading a song...</p>
       </template>
     </div>
