@@ -296,29 +296,20 @@ body {
   color: #7a007a;
 }
 
-/* Updated layout for genre and score */
-.genre-score-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-  text-align: center;
-}
-
 .genre-title {
   font-size: 28px;
   font-weight: bold;
+  text-align: center;
   color: #c600a1;
-  margin: 0;
+  margin-bottom: 16px;
 }
 
 .score-display {
+  text-align: center;
+  margin-bottom: 12px;
   font-size: 18px;
   font-weight: bold;
   color: #7a007a;
-  margin: 0;
 }
 
 .button-row {
@@ -530,7 +521,6 @@ audio {
   }
 }
 
-/* Mobile */
 @media (max-width: 600px) {
   .guess-game {
     padding: 24px;
@@ -544,10 +534,6 @@ audio {
   .correct-answers-grid {
     flex-direction: column;
     gap: 12px;
-  }
-
-  .genre-score-row {
-    flex-direction: column;
   }
 }
 </style>
