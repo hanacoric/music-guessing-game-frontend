@@ -36,13 +36,7 @@
               <strong>Album:</strong> {{ result.correct.album }}
             </div>
           </div>
-          <button
-            v-if="result && round === maxRounds && !finished"
-            @click="showFinalScore"
-            class="mt-4 bg-purple-600 text-white px-4 py-2 rounded"
-          >
-            See Final Score
-          </button>
+          <p v-if="round === maxRounds && !finished && result">Calculating final score...</p>
         </div>
 
         <button
