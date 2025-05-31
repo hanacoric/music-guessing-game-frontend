@@ -31,16 +31,19 @@ import { defineComponent } from 'vue'
 import axios from 'axios'
 
 const genreMap = {
-  'Alternative Rock': 1521,
-  'Psychedelic Rock': 133,
-  'Classic Rock': 77,
-  Grunge: 152,
-  Metal: 464,
-  'Nu Metal': 888,
-  'New Wave': 132,
-  Shoegaze: 85,
-  'Indie Rock': 999,
-  'Hip Hop': 116,
+  'Alternative Rock': 1,
+  Grunge: 2,
+  Metal: 3,
+  'Classic Rock': 4,
+  'New Wave': 5,
+  Shoegaze: 6,
+  'Hip Hop': 7,
+  Pop: 8,
+  'R&B': 9,
+  Jazz: 10,
+  Punk: 11,
+  Blues: 12,
+  Reggae: 13,
 } as const
 
 type Genre = keyof typeof genreMap
