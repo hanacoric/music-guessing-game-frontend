@@ -1,16 +1,18 @@
 <template>
   <div class="app-wrapper">
     <StartGame v-if="!gameStarted && !showFinal" @started="handleGameStart" />
+
     <GuessSong
-      v-if="started"
-      :genre="selectedGenre"
-      :deezerGenreId="selectedDeezerId"
+      v-if="gameStarted"
+      :genre="genre"
+      :deezerGenreId="deezerGenreId"
       :gameSessionId="gameSessionId"
+      :snippetDuration="snippetDuration"
       @gameFinished="handleGameFinished"
       @goToStart="resetToStart"
     />
 
-    <FinalScore v-if="showFinal" :score="finalScore" :rounds="maxRounds" @restart="restartGame" />
+    <FinalScore v-if="showFinal" :score="finalScore" :rounds="maxRounds" @restart="resetToStart" />
   </div>
 </template>
 
@@ -23,39 +25,47 @@ export default {
   components: { StartGame, GuessSong, FinalScore },
   data() {
     return {
-      genre: null,
-      deezerGenreId: null,
-      gameSessionId: null,
-      snippetDuration: 5, // default duration
+      genre: null as string | null,
+      deezerGenreId: null as string | number | null,
+      gameSessionId: null as string | number | null,
+      snippetDuration: 5,
       gameStarted: false,
       showFinal: false,
       finalScore: 0,
       maxRounds: 5,
     }
   },
-
   methods: {
-    handleGameStart({ genre, deezerGenreId, gameSessionId, snippetDuration }) {
+    handleGameStart({
+      genre,
+      deezerGenreId,
+      gameSessionId,
+      snippetDuration,
+    }: {
+      genre: string
+      deezerGenreId: string | number
+      gameSessionId: string | number
+      snippetDuration: number
+    }) {
       this.genre = genre
       this.deezerGenreId = deezerGenreId
       this.gameSessionId = gameSessionId
       this.snippetDuration = snippetDuration
       this.gameStarted = true
     },
-    handleGameFinished({ score, rounds }) {
+    handleGameFinished({ score, rounds }: { score: number; rounds: number }) {
       this.finalScore = score
       this.maxRounds = rounds
       this.showFinal = true
       this.gameStarted = false
     },
-    restartGame() {
-      this.started = false
-      this.selectedGenre = ''
-      this.selectedDeezerId = null
+    resetToStart() {
+      this.genre = null
+      this.deezerGenreId = null
       this.gameSessionId = null
       this.finalScore = 0
-      this.gameStarted = false
       this.showFinal = false
+      this.gameStarted = false
     },
   },
 }
