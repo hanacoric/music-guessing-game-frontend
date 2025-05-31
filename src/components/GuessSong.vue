@@ -318,7 +318,7 @@ body {
 }
 
 .score-display {
-  font-size: 18px;
+  font-size: 28px;
   font-weight: bold;
   color: #7a007a;
   margin: 0;
