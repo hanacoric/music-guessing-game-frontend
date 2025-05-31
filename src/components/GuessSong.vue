@@ -217,14 +217,18 @@ export default defineComponent({
           `${import.meta.env.VITE_BACKEND_URL}/api/game/score/${this.gameSessionId}`,
         )
         this.finalScore = scoreRes.data.score
-        if (this.round === this.maxRounds) {
+        if (!this.finished) {
           this.finished = true
-          this.$emit('gameFinished')
+          this.$emit('gameFinished', {
+            score: this.currentScore,
+            rounds: this.maxRounds,
+          })
         }
       } catch {
         console.error('Failed to fetch final score')
       }
     },
+
     async nextSong() {
       this.round++
       this.guess = {

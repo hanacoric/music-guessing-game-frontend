@@ -60,6 +60,8 @@ export default {
       this.gameStarted = true
     },
     async handleGameFinished() {
+      this.gameStarted = false
+
       try {
         const res = await fetch(
           `${import.meta.env.VITE_BACKEND_URL}/api/game/score/${this.gameSessionId}`,
@@ -71,8 +73,10 @@ export default {
         this.finalScore = 0
       }
 
-      this.showFinal = true
-      this.gameStarted = false
+      // Delay FinalScore
+      setTimeout(() => {
+        this.showFinal = true
+      }, 50)
     },
 
     resetToStart() {
