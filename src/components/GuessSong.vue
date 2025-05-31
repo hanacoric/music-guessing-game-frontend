@@ -1,7 +1,7 @@
 <template>
   <div class="guess-game-wrapper">
     <div class="guess-game">
-      <template v-if="song">
+      <template v-if="!finished && song">
         <h2 class="text-xl font-bold mb-2">Listen and Guess!</h2>
 
         <p class="timer">Time left: {{ timer }}s</p>
@@ -54,6 +54,10 @@
         </button>
       </template>
 
+      <template v-else-if="finished">
+        <FinalScore :score="finalScore" :rounds="maxRounds" @restart="restartGame" />
+      </template>
+
       <template v-else>
         <p class="loading">Loading a song...</p>
       </template>
@@ -64,6 +68,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import axios from 'axios'
+import FinalScore from './FinalScore.vue'
 
 interface Song {
   id: number
@@ -90,6 +95,9 @@ interface Result {
 
 export default defineComponent({
   name: 'GuessSong',
+  components: {
+    FinalScore,
+  },
   props: {
     genre: String,
     deezerGenreId: [String, Number],
@@ -220,7 +228,7 @@ export default defineComponent({
 
           setTimeout(async () => {
             const scoreRes = await axios.get(
-              `http://127.0.0.1:8000/api/game/score/${this.gameSessionId}`,
+              `${import.meta.env.VITE_BACKEND_URL}/api/game/score/${this.gameSessionId}`,
             )
             this.finalScore = scoreRes.data.score
 
@@ -245,13 +253,27 @@ export default defineComponent({
     async showFinalScore() {
       this.finished = true
 
-      const scoreRes = await axios.get(`http://127.0.0.1:8000/api/game/score/${this.gameSessionId}`)
+      const scoreRes = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/game/score/${this.gameSessionId}`,
+      )
       this.finalScore = scoreRes.data.score
 
       this.$emit('gameFinished', {
         score: this.finalScore,
         rounds: this.maxRounds,
       })
+    },
+    restartGame() {
+      this.finished = false
+      this.round = 1
+      this.finalScore = 0
+      this.result = null
+      this.guess = {
+        guessed_title: '',
+        guessed_artist: '',
+        guessed_album: '',
+      }
+      this.fetchRandomDeezerSong()
     },
   },
 })

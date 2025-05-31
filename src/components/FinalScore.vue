@@ -7,18 +7,23 @@
   </div>
 </template>
 
-
-
-<script>
+<script lang="ts">
 export default {
   name: 'FinalScore',
   props: {
-    score: Number,
-    rounds: Number
-  }
+    score: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+    rounds: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+  },
 }
 </script>
-
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Lilita+One&display=swap');
@@ -86,16 +91,25 @@ body {
 
 /* Background animation */
 @keyframes sparkleBackground {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
-
 </style>
-
-
