@@ -211,19 +211,16 @@ export default defineComponent({
       }
     },
     async showFinalScore() {
-      this.finished = true
       try {
         const scoreRes = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/api/game/score/${this.gameSessionId}`,
         )
         this.finalScore = scoreRes.data.score
-        if (!this.finished) {
-          this.finished = true
-          this.$emit('gameFinished', {
-            score: this.currentScore,
-            rounds: this.maxRounds,
-          })
-        }
+        this.finished = true
+        this.$emit('gameFinished', {
+          score: this.currentScore,
+          rounds: this.maxRounds,
+        })
       } catch {
         console.error('Failed to fetch final score')
       }
