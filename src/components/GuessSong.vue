@@ -322,6 +322,7 @@ body {
   flex-wrap: wrap;
   margin-top: 10px;
 }
+
 .choose-genre-btn {
   background-color: #f06292;
   color: white;
@@ -335,9 +336,10 @@ body {
   background-color: #ec407a;
 }
 
+/* WIDER box if it has answers shown */
 .guess-game {
-  max-width: 1200px;
   width: 100%;
+  max-width: 800px;
   padding: 32px;
   background-color: #fff0fb;
   border-radius: 20px;
@@ -345,6 +347,11 @@ body {
   animation: fadeIn 0.8s ease;
   text-align: center;
   margin: 40px auto;
+  transition: max-width 0.4s ease;
+}
+
+.guess-game.show-answers {
+  max-width: 1100px;
 }
 
 .timer {
@@ -352,6 +359,7 @@ body {
   color: #7a007a;
   margin-bottom: 20px;
 }
+
 .guess-game h2 {
   font-size: 26px;
   margin-bottom: 20px;
@@ -394,6 +402,7 @@ audio {
   margin-bottom: 20px;
   width: 100%;
 }
+
 .input {
   padding: 10px;
   font-size: 14px;
@@ -455,23 +464,23 @@ audio {
 }
 
 .correct-answers-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px 20px;
-  margin-top: 16px;
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 24px;
 }
 
 .answer-block {
   background-color: #ffe3f9;
-  padding: 10px 14px;
-  border-radius: 10px;
+  padding: 12px 20px;
+  border-radius: 12px;
   box-shadow: 0 0 6px rgba(255, 179, 245, 0.2);
   text-align: center;
   font-size: 14px;
   word-wrap: break-word;
+  min-width: 200px;
 }
 
 /* Animations */
@@ -517,11 +526,6 @@ audio {
 }
 
 @media (max-width: 600px) {
-  .form-grid,
-  .correct-answers-grid {
-    grid-template-columns: 1fr;
-  }
-
   .guess-game {
     padding: 24px;
   }
@@ -529,6 +533,11 @@ audio {
   .submit-btn,
   .guess-game button {
     width: 100%;
+  }
+
+  .correct-answers-grid {
+    flex-direction: column;
+    gap: 12px;
   }
 }
 </style>
